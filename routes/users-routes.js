@@ -1,10 +1,13 @@
 const express = require("express");
 
+const userController = require("../controllers/users-controllers");
+
 const router = express.Router();
 
-router.get("/users", (req, res, next) => {
-  console.log("GET request at users");
-  res.json({ status: "success", message: "this works!" });
-});
+router.get("/:uid", userController.getStatsByUid);
+
+router.post("/signup", userController.signup);
+
+router.post("/login", userController.login);
 
 module.exports = router;
