@@ -7,11 +7,48 @@
     <title>Document</title>
   </head>
   <body>
+    <h1>HTML PAGE</h1>
+    <button id="btnCreate">Create</button>
+    <button id="btnJoin">Join</button>
+    <input type="text" id="txtGameId" />
     <script>
+      const btnCreate = document.getElementById("btnCreate");
+      const btnJoin = document.getElementById("btnJoin");
+      const txtGameId = document.getElementById("txtGameId");
       let ws = new WebSocket("ws://localhost:4000");
+      let userId = null;
+      let gameId = null;
+
+      btnJoin.addEventListener("click", (e) => {
+        if (gameId === null) {
+          gameId = txtGameId.value;
+        }
+        console.log("gameId is: " + gameId);
+        const payLoad = {
+          method: "join",
+          userId: userId,
+          gameId: gameId,
+        };
+        ws.send(JSON.stringify(payLoad));
+      });
+
+      btnCreate.addEventListener("click", (e) => {
+        const payLoad = {
+          method: "create",
+          userId: userId,
+        };
+        ws.send(JSON.stringify(payLoad));
+      });
+
+      console.log("trying to connect to websocket");
       ws.onmessage = (message) => {
         const response = JSON.parse(message.data);
         console.log(response);
+        if (response.method === "connect") {
+          userId = response.userId;
+        } else if (response.method === "create") {
+          gameId = response.game.id;
+        }
       };
     </script>
   </body>
