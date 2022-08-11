@@ -12,24 +12,40 @@
     <button id="btnJoin">Join</button>
     <button id="btnPlay">Play</button>
     <input type="text" id="txtGameId" />
-    <input type="text" id="txtPlay" />
+    <input type="text" id="txtPlayMine" />
+    <input type="text" id="txtPlayOther" />
     <script>
       const btnCreate = document.getElementById("btnCreate");
       const btnJoin = document.getElementById("btnJoin");
       const btnPlay = document.getElementById("btnPlay");
       const txtGameId = document.getElementById("txtGameId");
-      const txtPlay = document.getElementById("txtPlay");
+      const txtPlayMine = document.getElementById("txtPlayMine");
+      const txtPlayOther = document.getElementById("txtPlayOther");
+
       let ws = new WebSocket("ws://localhost:4000");
       let userId = null;
       let gameId = null;
+      let game = null;
 
       btnPlay.addEventListener("click", (e) => {
-        if (gameId != null && txtPlay.value !== "") {
+        if (
+          gameId != null &&
+          txtPlayMine.value !== "" &&
+          txtPlayOther.value !== ""
+        ) {
+          game.gameUsers.map((user) => {
+            if (user.user.userId == userId) {
+              user.user.hand = txtPlayMine.value;
+            } else {
+              user.user.hand = txtPlayOther.value;
+            }
+            return user;
+          });
           const payLoad = {
             method: "play",
             userId: userId,
             gameId: gameId,
-            hand: txtPlay.value,
+            game: game,
           };
           ws.send(JSON.stringify(payLoad));
         }
@@ -63,7 +79,9 @@
         if (response.method === "connect") {
           userId = response.userId;
         } else if (response.method === "create") {
-          gameId = response.game.id;
+          gameId = response.gameId;
+        } else if (response.method === "join" && response.state === "success") {
+          game = response.game;
         }
       };
     </script>

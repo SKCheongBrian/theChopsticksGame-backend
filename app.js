@@ -87,7 +87,7 @@ wss.on("connection", function (ws, req) {
       const payLoad = {
         method: "create",
         state: "success",
-        game: games[gameId],
+        gameId: gameId,
       };
       ws.send(JSON.stringify(payLoad));
     }
@@ -128,14 +128,10 @@ wss.on("connection", function (ws, req) {
     if (result.method === "play") {
       const userId = result.userId;
       const gameId = result.gameId;
+      games[gameId] = result.game;
 
       const game = games[gameId];
-      game.gameUsers.map((user) => {
-        if (user.user.userId === userId) {
-          user.user.hand = result.hand;
-        }
-        return user;
-      });
+
       const payLoad = {
         method: "play",
         state: "success",
