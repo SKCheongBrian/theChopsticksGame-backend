@@ -118,10 +118,33 @@ wss.on("connection", function (ws, req) {
         console.log("game: " + JSON.stringify(game));
         payLoad.state = "success";
         payLoad.game = game;
+
         game.gameUsers.forEach((each) => {
           users[each.user.userId].connection.send(JSON.stringify(payLoad));
         });
       }
+    }
+
+    if (result.method === "play") {
+      const userId = result.userId;
+      const gameId = result.gameId;
+
+      const game = games[gameId];
+      game.gameUsers.map((user) => {
+        if (user.user.userId === userId) {
+          user.user.hand = result.hand;
+        }
+        return user;
+      });
+      const payLoad = {
+        method: "play",
+        state: "success",
+        game: game,
+      };
+
+      game.gameUsers.forEach((each) => {
+        users[each.user.userId].connection.send(JSON.stringify(payLoad));
+      });
     }
   });
 

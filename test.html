@@ -10,14 +10,30 @@
     <h1>HTML PAGE</h1>
     <button id="btnCreate">Create</button>
     <button id="btnJoin">Join</button>
+    <button id="btnPlay">Play</button>
     <input type="text" id="txtGameId" />
+    <input type="text" id="txtPlay" />
     <script>
       const btnCreate = document.getElementById("btnCreate");
       const btnJoin = document.getElementById("btnJoin");
+      const btnPlay = document.getElementById("btnPlay");
       const txtGameId = document.getElementById("txtGameId");
+      const txtPlay = document.getElementById("txtPlay");
       let ws = new WebSocket("ws://localhost:4000");
       let userId = null;
       let gameId = null;
+
+      btnPlay.addEventListener("click", (e) => {
+        if (gameId != null && txtPlay.value !== "") {
+          const payLoad = {
+            method: "play",
+            userId: userId,
+            gameId: gameId,
+            hand: txtPlay.value,
+          };
+          ws.send(JSON.stringify(payLoad));
+        }
+      });
 
       btnJoin.addEventListener("click", (e) => {
         if (gameId === null) {
